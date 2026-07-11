@@ -1,5 +1,5 @@
 type EmptyStateIllustrationProps = {
-  variant: "templates" | "matches" | "history";
+  variant: "templates" | "matches" | "history" | "notFound";
 };
 
 export function EmptyStateIllustration({ variant }: EmptyStateIllustrationProps) {
@@ -8,7 +8,19 @@ export function EmptyStateIllustration({ variant }: EmptyStateIllustrationProps)
       {variant === "templates" ? <TemplateStack /> : null}
       {variant === "matches" ? <GameTable /> : null}
       {variant === "history" ? <ScoreSlip /> : null}
+      {variant === "notFound" ? <LostCard /> : null}
     </div>
+  );
+}
+
+function LostCard() {
+  return (
+    <svg viewBox="0 0 96 80" aria-hidden="true" className="h-16 w-20">
+      <rect x="30" y="11" width="34" height="48" rx="5" fill="none" stroke="currentColor" strokeWidth="3" transform="rotate(10 47 35)" />
+      <path d="M38 31c1.5-5 5.5-8 10-7 4 .8 6.5 4.5 5.8 8.3-.7 4.2-4.6 5.6-7.2 7.5-1.8 1.3-2.4 2.6-2.4 5" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="3" />
+      <circle cx="44.3" cy="52.5" r="2.8" fill="currentColor" />
+      <path d="M20 64h56" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="3" opacity="0.45" />
+    </svg>
   );
 }
 

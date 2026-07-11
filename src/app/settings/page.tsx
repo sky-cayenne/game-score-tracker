@@ -25,8 +25,8 @@ export default function SettingsPage() {
 
   function resetSeed() {
     setDialog({
-      title: "Скинути до Бріджа?",
-      description: "Поточні шаблони, партії та історія будуть замінені стартовим шаблоном Бріджа.",
+      title: "Скинути до стартових шаблонів?",
+      description: "Поточні шаблони, партії та історія будуть замінені стартовими шаблонами Брідж і Uno Flip.",
       confirmLabel: "Скинути",
       variant: "danger",
       onConfirm: () => {
@@ -153,7 +153,7 @@ export default function SettingsPage() {
         <SectionTitle title="Скидання" subtitle="Корисно після тестових партій на етапі MVP." />
         <Button type="button" variant="secondary" onClick={resetSeed}>
           <RotateCcw size={18} />
-          Скинути до Бріджа
+          Скинути до стартових шаблонів
         </Button>
         <Button type="button" variant="danger" onClick={clearAll}>
           <Trash2 size={18} />

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Copy, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -18,6 +18,7 @@ import {
   parseScoreLimitMode
 } from "@/lib/repositories/templatesRepository";
 import { useAppData } from "@/lib/storage/useAppData";
+import { randomSuggestion, templateNameSuggestions } from "@/lib/suggestions";
 
 type DialogState = {
   title: string;
@@ -31,6 +32,11 @@ type DialogState = {
 export default function TemplatesPage() {
   const { data, ready, setData } = useAppData();
   const [dialog, setDialog] = useState<DialogState | null>(null);
+  const [templateName, setTemplateName] = useState("");
+
+  useEffect(() => {
+    setTemplateName((current) => current || randomSuggestion(templateNameSuggestions));
+  }, []);
 
   function createTemplate(formData: FormData) {
     const name = String(formData.get("name") ?? "").trim();
@@ -47,6 +53,7 @@ export default function TemplatesPage() {
         allowedRoundMultipliers: [1, 2, 3, 4]
       })
     );
+    setTemplateName(randomSuggestion(templateNameSuggestions));
   }
 
   function handleDuplicate(templateId: string) {
@@ -148,7 +155,13 @@ export default function TemplatesPage() {
         <section className="rounded-md border border-ink/10 bg-mist p-4">
           <SectionTitle title="Новий шаблон" />
           <form action={createTemplate} className="grid gap-3">
-            <TextField label="Назва гри" name="name" placeholder="Наприклад, Брідж або Дурень" required />
+            <TextField
+              label="Назва гри"
+              name="name"
+              value={templateName}
+              onChange={(event) => setTemplateName(event.target.value)}
+              required
+            />
             <div className="grid grid-cols-2 gap-3">
               <TextField label="К-сть раундів" name="roundLimit" inputMode="numeric" type="number" min="1" placeholder="без ліміту" />
               <TextField

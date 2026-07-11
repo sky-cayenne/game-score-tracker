@@ -3,6 +3,7 @@
 import type { AppData, GameTemplate } from "@/types/domain";
 
 const STORAGE_KEY = "card-scorekeeper:data:v1";
+const UNO_FLIP_PRESET_MIGRATION_KEY = "card-scorekeeper:migration:uno-flip-preset:v1";
 const BACKUP_APP_NAME = "card-scorekeeper";
 const BACKUP_SCHEMA_VERSION = 1;
 
@@ -314,7 +315,14 @@ function isNullableFiniteNumber(value: unknown): value is number | null {
 
 export function createSeedData(): AppData {
   const createdAt = nowIso();
-  const bridgeTemplate: GameTemplate = {
+  return {
+    ...emptyData,
+    templates: [createBridgeTemplate(createdAt), createUnoFlipTemplate(createdAt)]
+  };
+}
+
+function createBridgeTemplate(createdAt: string): GameTemplate {
+  return {
     id: createId(),
     name: "Брідж",
     createdAt,
@@ -327,10 +335,21 @@ export function createSeedData(): AppData {
     },
     cards: createBridgeDeck(createdAt)
   };
+}
 
+function createUnoFlipTemplate(createdAt: string): GameTemplate {
   return {
-    ...emptyData,
-    templates: [bridgeTemplate]
+    id: createId(),
+    name: "Uno Flip",
+    createdAt,
+    updatedAt: createdAt,
+    rules: {
+      roundLimit: null,
+      winningScoreLimit: 500,
+      scoreLimitMode: "win",
+      allowedRoundMultipliers: [1, 2, 3, 4]
+    },
+    cards: createUnoFlipDeck(createdAt)
   };
 }
 
@@ -375,6 +394,82 @@ function getBridgeCardPoints(rank: string, suit: string) {
   return 0;
 }
 
+function createUnoFlipDeck(createdAt: string): GameTemplate["cards"] {
+  const lightColors = ["Червоний", "Жовтий", "Зелений", "Синій"];
+  const darkColors = ["Бірюзовий", "Помаранчевий", "Рожевий", "Фіолетовий"];
+  const cards: GameTemplate["cards"] = [];
+
+  lightColors.forEach((color) => {
+    addUnoColorCards(cards, {
+      side: "Світла сторона",
+      color,
+      numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      actions: [
+        ["Візьми 1", 10],
+        ["Пропуск", 20],
+        ["Реверс", 20],
+        ["Flip", 20]
+      ],
+      createdAt
+    });
+  });
+
+  darkColors.forEach((color) => {
+    addUnoColorCards(cards, {
+      side: "Темна сторона",
+      color,
+      numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      actions: [
+        ["Візьми 5", 20],
+        ["Пропустити всіх", 30],
+        ["Реверс", 20],
+        ["Flip", 20]
+      ],
+      createdAt
+    });
+  });
+
+  addUnoCard(cards, "Wild", 40, "Світла сторона / Wild", createdAt);
+  addUnoCard(cards, "Wild Візьми 2", 50, "Світла сторона / Wild", createdAt);
+  addUnoCard(cards, "Wild", 40, "Темна сторона / Wild", createdAt);
+  addUnoCard(cards, "Wild колір", 60, "Темна сторона / Wild", createdAt);
+
+  return cards;
+}
+
+function addUnoColorCards(
+  cards: GameTemplate["cards"],
+  options: {
+    side: string;
+    color: string;
+    numbers: number[];
+    actions: Array<[name: string, points: number]>;
+    createdAt: string;
+  }
+) {
+  const suitOrColor = `${options.side} / ${options.color}`;
+
+  options.numbers.forEach((number) => {
+    addUnoCard(cards, String(number), number, suitOrColor, options.createdAt);
+  });
+
+  options.actions.forEach(([name, points]) => {
+    addUnoCard(cards, name, points, suitOrColor, options.createdAt);
+  });
+}
+
+function addUnoCard(cards: GameTemplate["cards"], name: string, points: number, suitOrColor: string, createdAt: string) {
+  cards.push({
+    id: createId(),
+    name,
+    points,
+    suitOrColor,
+    sortOrder: cards.length,
+    createdAt,
+    updatedAt: createdAt
+  });
+}
+
 export function clearData() {
   try {
     window.localStorage.removeItem(STORAGE_KEY);
@@ -392,10 +487,25 @@ export function resetToSeedData() {
 export function seedDemoData() {
   const existing = loadData();
   if (existing.templates.length > 0) {
+    const hasUnoFlip = existing.templates.some((template) => template.name.trim().toLowerCase() === "uno flip");
+    const wasUnoFlipMigrationApplied = window.localStorage.getItem(UNO_FLIP_PRESET_MIGRATION_KEY) === "done";
+
+    if (!hasUnoFlip && !wasUnoFlipMigrationApplied) {
+      const createdAt = nowIso();
+      const nextData = {
+        ...existing,
+        templates: [...existing.templates, createUnoFlipTemplate(createdAt)]
+      };
+      saveData(nextData);
+      window.localStorage.setItem(UNO_FLIP_PRESET_MIGRATION_KEY, "done");
+      return nextData;
+    }
+
     return existing;
   }
 
   const nextData = createSeedData();
   saveData(nextData);
+  window.localStorage.setItem(UNO_FLIP_PRESET_MIGRATION_KEY, "done");
   return nextData;
 }

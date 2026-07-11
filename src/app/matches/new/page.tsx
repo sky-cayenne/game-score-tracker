@@ -19,12 +19,10 @@ export default function NewMatchPage() {
   const [playerName, setPlayerName] = useState("");
   const [playerNames, setPlayerNames] = useState<string[]>([]);
   const [validationMessages, setValidationMessages] = useState<string[]>([]);
-  const [matchNamePlaceholder, setMatchNamePlaceholder] = useState(matchNameSuggestions[0]);
-  const [playerNamePlaceholder, setPlayerNamePlaceholder] = useState(playerNameSuggestions[0]);
 
   useEffect(() => {
-    setMatchNamePlaceholder(randomSuggestion(matchNameSuggestions));
-    setPlayerNamePlaceholder(randomSuggestion(playerNameSuggestions));
+    setMatchName((current) => current || randomSuggestion(matchNameSuggestions));
+    setPlayerName((current) => current || randomSuggestion(playerNameSuggestions));
   }, []);
 
   function addPlayer() {
@@ -35,7 +33,7 @@ export default function NewMatchPage() {
     }
 
     setPlayerNames((current) => [...current, normalizedName]);
-    setPlayerName("");
+    setPlayerName(randomSuggestion(playerNameSuggestions));
     setValidationMessages([]);
   }
 
@@ -102,7 +100,6 @@ export default function NewMatchPage() {
             setMatchName(event.target.value);
             setValidationMessages([]);
           }}
-          placeholder={matchNamePlaceholder}
           className={validationMessages.some((message) => message.includes("назву")) ? "border-berry/50 ring-4 ring-berry/10" : ""}
         />
 
@@ -137,7 +134,6 @@ export default function NewMatchPage() {
               setPlayerName(event.target.value);
               setValidationMessages([]);
             }}
-            placeholder={playerNamePlaceholder}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();

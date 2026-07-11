@@ -14,6 +14,7 @@ import { matchNameSuggestions, playerNameSuggestions, randomSuggestion } from "@
 export default function NewMatchPage() {
   const router = useRouter();
   const { data, setData } = useAppData();
+  const addGameOptionValue = "__add-game__";
   const [matchName, setMatchName] = useState("");
   const [templateId, setTemplateId] = useState("");
   const [playerName, setPlayerName] = useState("");
@@ -104,25 +105,32 @@ export default function NewMatchPage() {
         />
 
         <label htmlFor="templateId" className="grid gap-1.5 text-sm font-semibold text-ink">
-          <span>Шаблон гри</span>
+          <span>Гра</span>
           <select
             id="templateId"
             name="templateId"
             value={templateId}
             onChange={(event) => {
-              setTemplateId(event.target.value);
+              const nextValue = event.target.value;
+              if (nextValue === addGameOptionValue) {
+                router.push("/templates/new");
+                return;
+              }
+
+              setTemplateId(nextValue);
               setValidationMessages([]);
             }}
             className={`tap-target rounded-md border bg-white px-3 text-base outline-none focus:border-felt focus:ring-2 focus:ring-felt/15 ${
               validationMessages.some((message) => message.includes("шаблон")) ? "border-berry/50 ring-4 ring-berry/10" : "border-ink/12"
             }`}
           >
-            <option value="">Обери шаблон</option>
+            <option value="">Обери гру</option>
             {data.templates.map((template) => (
               <option key={template.id} value={template.id}>
                 {template.name}
               </option>
             ))}
+            <option value={addGameOptionValue}>+ Додати гру</option>
           </select>
         </label>
 

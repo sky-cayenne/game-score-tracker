@@ -6,15 +6,21 @@ import type { GameTemplateRules } from "@/types/domain";
 type ScoreLimitModeFieldProps = {
   defaultValue?: GameTemplateRules["scoreLimitMode"];
   defaultLimitValue?: number | null;
+  forceVisible?: boolean;
 };
 
-export function ScoreLimitModeField({ defaultValue = "win", defaultLimitValue = null }: ScoreLimitModeFieldProps) {
+export function ScoreLimitModeField({ defaultValue = "win", defaultLimitValue = null, forceVisible = false }: ScoreLimitModeFieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [hasScoreLimit, setHasScoreLimit] = useState(defaultLimitValue !== null);
+  const [hasScoreLimit, setHasScoreLimit] = useState(forceVisible || defaultLimitValue !== null);
 
   useEffect(() => {
     const form = containerRef.current?.closest("form");
     const scoreLimitInput = form?.querySelector<HTMLInputElement>('input[name="winningScoreLimit"]');
+
+    if (forceVisible) {
+      setHasScoreLimit(true);
+      return;
+    }
 
     if (!scoreLimitInput) {
       return;
@@ -30,13 +36,15 @@ export function ScoreLimitModeField({ defaultValue = "win", defaultLimitValue = 
     return () => {
       scoreLimitInput.removeEventListener("input", updateVisibility);
     };
-  }, []);
+  }, [forceVisible]);
 
   return (
     <div ref={containerRef}>
       {hasScoreLimit ? (
         <label htmlFor="scoreLimitMode" className="grid gap-1.5 text-sm font-bold text-ink">
-          <span className="text-xs font-black uppercase tracking-[0.08em] text-ink/58">Ліміт очок означає</span>
+          <span className="text-xs font-black uppercase tracking-[0.08em] text-ink/58">
+            {forceVisible ? "Якщо задано ліміт очок, він означає" : "Ліміт очок означає"}
+          </span>
           <select
             id="scoreLimitMode"
             name="scoreLimitMode"

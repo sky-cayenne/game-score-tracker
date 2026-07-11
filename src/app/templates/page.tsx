@@ -173,7 +173,7 @@ export default function TemplatesPage() {
                 placeholder="без ліміту"
               />
             </div>
-            <ScoreLimitModeField />
+            <ScoreLimitModeField forceVisible />
             <Button type="submit">
               <Plus size={18} />
               Створити

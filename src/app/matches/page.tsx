@@ -25,11 +25,11 @@ export default function MatchesPage() {
         </Link>
       </section>
 
-      <MatchSection matches={activeMatches} emptyText="Активних партій немає." />
+      <MatchSection matches={activeMatches} />
     </div>
   );
 
-  function MatchSection({ matches, emptyText }: { matches: Match[]; emptyText: string }) {
+  function MatchSection({ matches }: { matches: Match[] }) {
     return (
       <section>
         <div className="grid gap-3">
@@ -39,10 +39,16 @@ export default function MatchesPage() {
           {matches.length === 0 ? (
             <div className="rounded-md border border-dashed border-ink/20 p-5 text-center">
               <EmptyStateIllustration variant="matches" />
-              <p className="text-sm text-ink/60">{emptyText}</p>
+              <p className="text-base font-black text-ink">Почни з нової партії</p>
+              <p className="mt-2 text-sm leading-5 text-ink/60">
+                Створи партію, обери гру з шаблонів, додай мінімум двох гравців і після кожного раунду вводь очки.
+              </p>
               {activeMatches.length === 0 ? (
                 <Link href="/matches/new" className="mt-3 inline-flex">
-                  <Button>Створити партію</Button>
+                  <Button>
+                    <Plus size={18} />
+                    Створити партію
+                  </Button>
                 </Link>
               ) : null}
             </div>

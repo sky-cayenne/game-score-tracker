@@ -68,7 +68,7 @@ export default function NewTemplatePage() {
               placeholder="без ліміту"
             />
           </div>
-          <ScoreLimitModeField />
+          <ScoreLimitModeField forceVisible />
           <Button type="submit">
             <Plus size={18} />
             Створити шаблон

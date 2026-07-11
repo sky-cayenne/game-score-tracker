@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import { ClipboardList, Layers3, Settings, Trophy } from "lucide-react";
 
 const navItems = [
-  { href: "/templates", label: "Шаблони", icon: Layers3 },
   { href: "/matches", label: "Партії", icon: Trophy },
   { href: "/logs", label: "Історія", icon: ClipboardList },
+  { href: "/templates", label: "Шаблони", icon: Layers3 },
   { href: "/settings", label: "Дані", icon: Settings }
 ];
 
